@@ -1,47 +1,49 @@
 var fs = require("fs");
 const chalk = require("chalk");
 
-const getNotes = function () {
+const getNotes = () => {
    const notes = loadNotes();
-   console.log(notes)
+
+   notes.forEach(note => {
+    console.log(chalk.white.inverse.bold(note.title + ", " + note.body))
+   });
+  
 };
 
-const getSingleNotes = function (title) {
+const readNote = (title) => {
     const notes = loadNotes();
-    const newNote = notes.filter(note => {
-        if(note.title == title){
-            console.log(note)
-        }
-
-    })
+    const note = notes.find((note) => note.title === title)
+        
+    if(note){
+        console.log(chalk.white.inverse.bold(note.title + ", " + note.body))    
+    }else{
+        console.log(chalk.red.inverse.bold("Note not found with this title"))
+    }
+  
  };
 
-const addNotes = function (title, body) {
+const addNotes = (title, body) => {
     const notes = loadNotes();
-    const duplicate = notes.filter((note) => {
-        return note.title == title;
-    });
-
-    debugger;
-
-    if (duplicate.length === 0) {
+  
+    const duplicate = notes.find((note) => note.title === title)
+ 
+    if (!duplicate) {
         notes.push({
             title: title,
             body: body,
         });
-
         saveNote(notes);
     } else {
         console.log(chalk.red.inverse.bold("Duplicate title, already taken"));
     }
 };
 
-const saveNote = function (notes) {
+const saveNote = (notes) => {
     fs.writeFileSync("notes.json", JSON.stringify(notes));
-    console.log(chalk.green.inverse.bold("Notes saves"));
+    console.log(chalk.green.inverse.bold("Note saved"));
 };
 
-const loadNotes = function () {
+const loadNotes = () => {
     try {
         const buffers = fs.readFileSync("notes.json");
         const dataJSON = buffers.toString();
@@ -51,7 +53,7 @@ const loadNotes = function () {
     }
 };
 
-const deleteNotes = function (title) {
+const deleteNote = (title) => {
     const notes = loadNotes()
 
     const newNoteArr = notes.filter(note => { return  note.title != title })
@@ -70,6 +72,6 @@ const deleteNotes = function (title) {
 module.exports = {
     getNotes,
     addNotes,
-    deleteNotes,
-    getSingleNotes
+    deleteNote,
+    readNote
 };
